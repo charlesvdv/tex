@@ -1,20 +1,20 @@
 #[derive(Debug, PartialEq, Eq)]
-pub struct LexerElem {
-    pub elem: Elem,
+pub struct LexerElem<'a> {
+    pub elem: Elem<'a>,
     pub pos: Position,
 }
 
-impl LexerElem {
-    pub fn new(elem: Elem, pos: Position) -> Self {
+impl<'a> LexerElem<'a> {
+    pub fn new(elem: Elem<'a>, pos: Position) -> Self {
         LexerElem { elem, pos }
     }
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum Elem {
-    Text(String),
-    Control(String),
-    Comment(String),
+pub enum Elem<'a> {
+    Text(&'a str),
+    Control(&'a str),
+    Comment(&'a str),
     Number(i32),
     EscapedChar(char),
     SpecialChar(char),
@@ -33,12 +33,12 @@ pub enum Elem {
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Position {
-    pub line: i32,
-    pub column: i32,
+    pub line: usize,
+    pub column: usize,
 }
 
 impl Position {
-    pub fn new(line: i32, column: i32) -> Self {
+    pub fn new(line: usize, column: usize) -> Self {
         Position { line, column }
     }
 
@@ -47,11 +47,7 @@ impl Position {
         self.column = 0;
     }
 
-    pub fn char(&mut self) {
-        self.column += 1;
-    }
-
-    pub fn chars(&mut self, size: usize) {
-        self.column += size as i32;
+    pub fn advance(&mut self, bytes_len: usize) {
+        self.column += bytes_len;
     }
 }
