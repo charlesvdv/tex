@@ -74,8 +74,7 @@ impl Catcodes {
 impl Default for Catcodes {
     fn default() -> Self {
         Catcodes {
-            codes:
-                [
+            codes: [
                     vec!['\\'],
                     vec!['{'],
                     vec!['}'],
@@ -92,7 +91,7 @@ impl Default for Catcodes {
                     vec!['~'],
                     vec!['%'],
                     vec![127 as char], // 127 is the delete ASCII character
-                ]
+                ],
         }
     }
 }
