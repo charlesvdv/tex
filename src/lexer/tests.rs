@@ -5,7 +5,7 @@ use super::*;
 fn test_basic_lexer() {
     let catcodes = Catcodes::default();
 
-    let input = "foo bar \\{
+    let input = "foo bar \\{ -
 \\bar \\foo{bar}
 \\def \\foo #1v#2{bar}";
 
@@ -13,7 +13,9 @@ fn test_basic_lexer() {
 
     let data = vec![LexerElem::new(Elem::Text("foo bar "), Position::new(0, 0)),
                     LexerElem::new(Elem::EscapedChar('{'), Position::new(0, 8)),
-                    LexerElem::new(Elem::LineBreak, Position::new(0, 10)),
+                    LexerElem::new(Elem::Space, Position::new(0, 10)),
+                    LexerElem::new(Elem::SpecialChar('-'), Position::new(0, 11)),
+                    LexerElem::new(Elem::LineBreak, Position::new(0, 12)),
                     LexerElem::new(Elem::Control("bar"), Position::new(1, 0)),
                     LexerElem::new(Elem::Space, Position::new(1, 4)),
                     LexerElem::new(Elem::Control("foo"), Position::new(1, 5)),
