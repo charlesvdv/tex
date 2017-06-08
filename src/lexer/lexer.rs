@@ -101,7 +101,7 @@ impl<'a> Lexer<'a> {
                 Elem::SpecialChar(v)
             }
             Some(v) if self.catcodes.is_letter(v) => {
-                Elem::Control(self.streamer
+                Elem::Command(self.streamer
                                   .take_while(|x| {
                                                   self.catcodes.is_letter(x) ||
                                                   self.catcodes.is_other_character(x)

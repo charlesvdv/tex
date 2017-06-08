@@ -13,7 +13,7 @@ impl<'a> LexerElem<'a> {
 #[derive(Debug, PartialEq, Eq)]
 pub enum Elem<'a> {
     Text(&'a str),
-    Control(&'a str),
+    Command(&'a str),
     Comment(&'a str),
     Number(i32),
     EscapedChar(char),
