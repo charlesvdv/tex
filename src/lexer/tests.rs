@@ -1,15 +1,12 @@
-use super::catcodes::Catcodes;
 use super::*;
 
 #[test]
-fn test_basic_lexer() {
-    let catcodes = Catcodes::default();
-
+fn test_normal_lexer() {
     let input = "foo bar \\{ -
 \\bar \\foo{bar}
 \\def \\foo #1v#2{bar}";
 
-    let lexer = Lexer::new(input);
+    let mut lexer = Lexer::new(input);
 
     let data = vec![LexerElem::new(Elem::Text("foo bar "), Position::new(0, 0)),
                     LexerElem::new(Elem::EscapedChar('{'), Position::new(0, 8)),
@@ -36,6 +33,41 @@ fn test_basic_lexer() {
                     LexerElem::new(Elem::Text("bar"), Position::new(2, 16)),
                     LexerElem::new(Elem::EndGroup, Position::new(2, 19)),
                     LexerElem::new(Elem::EndOfFile, Position::new(2, 20))];
+
+    for d in data {
+        assert_eq!(lexer.next(), d);
+    }
+
+    assert_eq!(lexer.next(),
+               LexerElem::new(Elem::EndOfFile, Position::new(2, 20)));
+}
+
+#[test]
+fn test_peek_next() {
+    let input = "\\foo a string\\bar
+{a string enclosed by a group}";
+
+    let mut lexer = Lexer::new(input);
+
+    let data = vec![LexerElem::new(Elem::Command("foo"), Position::new(0, 0)),
+                    LexerElem::new(Elem::Text(" a string"), Position::new(0, 4)),
+                    LexerElem::new(Elem::Command("bar"), Position::new(0, 13)),
+                    LexerElem::new(Elem::LineBreak, Position::new(0, 17)),
+                    LexerElem::new(Elem::BeginGroup, Position::new(1, 0)),
+                    LexerElem::new(Elem::Text("a string enclosed by a group"),
+                                   Position::new(1, 1)),
+                    LexerElem::new(Elem::EndGroup, Position::new(1, 29)),
+                    LexerElem::new(Elem::EndOfFile, Position::new(1, 30))];
+
+    for d in &data {
+        assert_eq!(lexer.peek_next(), d);
+    }
+
+    lexer.reset_peek();
+
+    for d in &data {
+        assert_eq!(lexer.peek_next(), d);
+    }
 
     for d in data {
         assert_eq!(lexer.next(), d);

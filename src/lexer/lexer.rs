@@ -1,20 +1,60 @@
+use std::collections::VecDeque;
 use lexer::{Catcodes, Elem, LexerElem, ZeroCopyStreamer};
 
 #[derive(Debug)]
 pub struct Lexer<'a> {
     streamer: ZeroCopyStreamer<'a>,
     catcodes: Catcodes,
+    // Used by `peek_next` function.
+    peeked: VecDeque<LexerElem<'a>>,
+    peek_offset: usize,
 }
+
 
 impl<'a> Lexer<'a> {
     pub fn new(input: &'a str) -> Self {
         Lexer {
             streamer: ZeroCopyStreamer::new(input),
             catcodes: Catcodes::default(),
+            peeked: VecDeque::new(),
+            peek_offset: 0,
         }
     }
 
-    pub fn next(&self) -> LexerElem {
+    pub fn next(&mut self) -> LexerElem<'a> {
+        self.reset_peek();
+
+        if self.peeked.is_empty() {
+            self.tokenize_element()
+        } else {
+            self.peeked.pop_front().unwrap()
+        }
+    }
+
+    pub fn peek_next(&mut self) -> &LexerElem<'a> {
+        if self.peek_offset == self.peeked.len() {
+            self.peek_offset += 1;
+            // Get the newest token.
+            let token = self.tokenize_element();
+            self.peeked.push_back(token);
+            self.peeked.back().unwrap()
+        } else if self.peek_offset < self.peeked.len() {
+            self.peek_offset += 1;
+            self.peeked.get(self.peek_offset - 1).unwrap()
+        } else {
+            unreachable!();
+        }
+    }
+
+    pub fn reset_peek(&mut self) {
+        self.peek_offset = 0;
+    }
+
+    pub fn set_catcode(&mut self, code: usize, value: char) {
+        self.catcodes.set_catcode(code, value);
+    }
+
+    fn tokenize_element(&self) -> LexerElem<'a> {
         let pos = self.streamer.get_pos();
 
         let elem = match self.streamer.peek_char() {
@@ -86,11 +126,9 @@ impl<'a> Lexer<'a> {
         LexerElem::new(elem, pos)
     }
 
-    pub fn set_catcode(&mut self, code: usize, value: char) {
-        self.catcodes.set_catcode(code, value);
-    }
-
-    fn elem_control_sequence(&self) -> Elem {
+    // Match everything that begin by the control sequence character
+    // (in most case: `\`).
+    fn elem_control_sequence(&self) -> Elem<'a> {
         match self.streamer.peek_char() {
             Some(v) if self.catcodes.is_escaped_char(v) => {
                 self.streamer.read_char();
@@ -119,7 +157,7 @@ impl<'a> Lexer<'a> {
             .unwrap()
     }
 
-    fn text(&self) -> &str {
+    fn text(&self) -> &'a str {
         self.streamer
             .take_while(|x| {
                             !self.catcodes.is_control_sequence(x) &&

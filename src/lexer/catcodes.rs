@@ -12,6 +12,14 @@ macro_rules! catcode_test {
     )
 }
 
+/// Keep tracks of the category code of each characters.
+///
+/// In TeX, some characters have specials meaning. For example,
+/// you may know `%` as the character to create comments.
+/// TeX can change character behaviour using `\catcode` command.
+///
+/// The purpose of this struct is to keep track of these changes
+/// and have a clean interface for the lexer.
 #[derive(Debug)]
 pub struct Catcodes {
     codes: [Vec<char>; 16],

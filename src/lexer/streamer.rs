@@ -41,9 +41,12 @@ impl<'a> ZeroCopyStreamer<'a> {
         }
     }
 
-    pub fn take_while<P>(&self, predicate: P) -> &str
+    pub fn take_while<P>(&self, predicate: P) -> &'a str
         where P: Fn(char) -> bool
     {
+        // Reset peek_offset before consuming.
+        self.peek_offset.set(0);
+
         let mut bytes_len = 0;
         loop {
             match self.peek_char() {
@@ -55,7 +58,7 @@ impl<'a> ZeroCopyStreamer<'a> {
         }
 
         let old_offset = self.offset.get();
-        self.update_pos(bytes_len + 1);
+        self.update_pos(bytes_len);
         &self.input[old_offset..self.offset.get()]
     }
 
