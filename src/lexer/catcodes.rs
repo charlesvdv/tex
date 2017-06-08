@@ -22,7 +22,7 @@ impl Catcodes {
         Self::default()
     }
 
-    pub fn set_catcode(&mut self, index: i8, value: char) {
+    pub fn set_catcode(&mut self, index: usize, value: char) {
         assert!(index > 0 && index < 16);
 
         // Check if the code is used by others catcodes.
@@ -31,7 +31,7 @@ impl Catcodes {
         }
 
         // Update the codes.
-        self.codes[index as usize].push(value);
+        self.codes[index].push(value);
     }
 
     catcode_test!(is_control_sequence, 0);

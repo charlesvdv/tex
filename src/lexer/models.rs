@@ -31,7 +31,7 @@ pub enum Elem<'a> {
     MacroParam,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct Position {
     pub line: usize,
     pub column: usize,
@@ -40,14 +40,5 @@ pub struct Position {
 impl Position {
     pub fn new(line: usize, column: usize) -> Self {
         Position { line, column }
-    }
-
-    pub fn new_line(&mut self) {
-        self.line += 1;
-        self.column = 0;
-    }
-
-    pub fn advance(&mut self, bytes_len: usize) {
-        self.column += bytes_len;
     }
 }

@@ -9,7 +9,7 @@ fn test_basic_lexer() {
 \\bar \\foo{bar}
 \\def \\foo #1v#2{bar}";
 
-    let mut lexer = Lexer::new(input);
+    let lexer = Lexer::new(input);
 
     let data = vec![LexerElem::new(Elem::Text("foo bar "), Position::new(0, 0)),
                     LexerElem::new(Elem::EscapedChar('{'), Position::new(0, 8)),
@@ -38,6 +38,6 @@ fn test_basic_lexer() {
                     LexerElem::new(Elem::EndOfFile, Position::new(2, 20))];
 
     for d in data {
-        assert_eq!(lexer.next(&catcodes), d);
+        assert_eq!(lexer.next(), d);
     }
 }
