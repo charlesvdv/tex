@@ -1,12 +1,20 @@
 #[derive(Debug, PartialEq, Eq)]
 pub struct LexerElem<'a> {
-    pub elem: Elem<'a>,
-    pub pos: Position,
+    elem: Elem<'a>,
+    pos: Position,
 }
 
 impl<'a> LexerElem<'a> {
     pub fn new(elem: Elem<'a>, pos: Position) -> Self {
         LexerElem { elem, pos }
+    }
+
+    pub fn elem(&self) -> &Elem<'a> {
+        &self.elem
+    }
+
+    pub fn position(&self) -> &Position {
+        &self.pos
     }
 }
 
