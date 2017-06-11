@@ -3,8 +3,5 @@ name = "tex"
 version = "0.1.0"
 authors = ["charlesvdv <charles.vandevoorde@hotmail.be>"]
 
-[dependencies]
-quick-error = "1.2.*"
-
 [dev-dependencies]
 wait-timeout = "0.1.*"

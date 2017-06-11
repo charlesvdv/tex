@@ -9,7 +9,7 @@ use std::io::prelude::*;
 use std::time::Duration;
 use self::wait_timeout::ChildExt;
 
-pub use self::tex::parser::*;
+pub use self::tex::parser;
 
 pub mod format;
 pub use format::*;

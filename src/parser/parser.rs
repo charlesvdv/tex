@@ -1,13 +1,17 @@
 use parser::context::ParserContext;
-use parser::errors::ParsingError;
 use parser::models::ParserElem;
-use lexer::{Lexer, LexerElem, Elem};
+use lexer::Lexer;
+use parser::{ParsingInterpreter, InterpreterOutput, ParseResult};
 
-type ParseResult<T> = Result<T, ParsingError>;
+use parser::comment::CommentInterpreter;
+use parser::text::{TextInterpreter, EscapeCharInterpreter};
+use parser::command::CommandInterpreter;
+
 
 pub struct Parser<'a> {
     lexer: Lexer<'a>,
     context: ParserContext,
+    interpreters: Vec<Box<ParsingInterpreter>>,
 }
 
 impl<'a> Parser<'a> {
@@ -15,46 +19,30 @@ impl<'a> Parser<'a> {
         Parser {
             lexer: Lexer::new(input),
             context: ParserContext::new(),
+            interpreters: vec![Box::new(CommentInterpreter::new()),
+                               Box::new(TextInterpreter::new()),
+                               Box::new(CommandInterpreter::new()),
+                               Box::new(EscapeCharInterpreter::new())],
         }
     }
 
     pub fn parse(&mut self) -> ParseResult<Vec<ParserElem>> {
         let mut result = vec![];
-        loop {
+        'main: loop {
             let token = self.lexer.next();
-            match token.elem() {
-                &Elem::Text(v) => result.push(ParserElem::Text(v.into())),
-                &Elem::EscapedChar(v) => result.push(ParserElem::Text(v.to_string())),
-                &Elem::LineBreak => result.push(ParserElem::Text("\n".into())),
-                &Elem::Comment(_) => {
-                    // We need to check if the comment is on a complete line or just
-                    // on the end of a line to see if we need to consume or not the linebreak.
-                    match result.last() {
-                        Some(v) => {
-                            if let &ParserElem::Text(ref t) = v {
-                                if let Some(ch) = t.chars().last() {
-                                    if ch == '\n' {
-                                        // Consume the linebreak.
-                                        self.lexer.next();
-                                    }
-                                }
-                            }
-                        }
-                        None => {
-                            self.lexer.next();
-                        }
-                    }
+            'int: for int in &self.interpreters {
+                let out = int.interpret(token.elem(),
+                                        &mut result,
+                                        &mut self.lexer,
+                                        &mut self.context);
+                match out {
+                    Ok(InterpreterOutput::Stop) => break 'main,
+                    Ok(InterpreterOutput::Matched) => break 'int,
+                    Ok(_) => continue,
+                    Err(err) => return Err(err),
                 }
-                &Elem::Command(v) => {
-                    if v == "bye" {
-                        return Ok(result);
-                    }
-                    continue;
-                }
-                _ => continue,
             }
         }
-
         Ok(result)
     }
 }
