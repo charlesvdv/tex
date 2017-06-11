@@ -8,13 +8,34 @@ matrix:
   allow_failures:
     - nightly
 
-cache: cargo
+cache:
+  cargo: true
+  directories:
+    - $HOME/kcov
 
 install:
   - export PATH="$PATH:$HOME/.cargo/bin"
   - which rustfmt || cargo install rustfmt
+  - .ci/install-kcov.sh
+
+addons:
+  apt:
+    packages:
+      # packages required to compile kcov
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - cmake
+      - gcc
+      - libbfd-dev
 
 script:
   - cargo fmt -- --write-mode=diff
+  # remove old build because travis cache them and this could be bad
+  # for code coverage mesurement.
+  - cargo clean
   - cargo build
   - cargo test
+
+after_success:
+  - .ci/coverage.sh
