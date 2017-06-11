@@ -22,6 +22,7 @@ addons:
   apt:
     packages:
       # packages required to compile kcov
+      - texlive-base
       - libcurl4-openssl-dev
       - libelf-dev
       - libdw-dev
@@ -29,11 +30,14 @@ addons:
       - gcc
       - libbfd-dev
 
-script:
-  - cargo fmt -- --write-mode=diff
-  # remove old build because travis cache them and this could be bad
+before_script:
+  - tex --version
+  # Remove old build because travis cache them and this could be bad
   # for code coverage mesurement.
   - cargo clean
+
+script:
+  - cargo fmt -- --write-mode=diff
   - cargo build
   - cargo test
 
