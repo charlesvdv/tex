@@ -1,3 +1,7 @@
 target/
-**/*.rs.bk
+**/*.rs.bk*
 Cargo.lock
+
+# Ignore tex generation
+*.dvi
+*.log
