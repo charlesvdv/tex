@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LexerElem<'a> {
     elem: Elem<'a>,
     pos: Position,
@@ -16,9 +16,13 @@ impl<'a> LexerElem<'a> {
     pub fn position(&self) -> &Position {
         &self.pos
     }
+
+    pub fn consume(self) -> (Elem<'a>, Position) {
+        (self.elem, self.pos)
+    }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Elem<'a> {
     Text(&'a str),
     Command(&'a str),

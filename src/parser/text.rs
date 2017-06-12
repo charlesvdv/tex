@@ -30,8 +30,8 @@ impl ParsingInterpreter for TextInterpreter {
             {
                 let next = lexer.peek_next();
                 match next {
-                    &lexer::Elem::Text(v) => txt.push_str(v),
-                    &lexer::Elem::LineBreak => txt.push('\n'),
+                    lexer::Elem::Text(v) => txt.push_str(v),
+                    lexer::Elem::LineBreak => txt.push('\n'),
                     _ => break,
                 }
             }
