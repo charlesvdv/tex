@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LexerElem<'a> {
     elem: Elem<'a>,
     pos: Position,
@@ -18,7 +18,7 @@ impl<'a> LexerElem<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Elem<'a> {
     Text(&'a str),
     Command(&'a str),

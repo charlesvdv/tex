@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::cell::{Cell, RefCell};
 use lexer::{Catcodes, Elem, LexerElem, ZeroCopyStreamer};
 
 #[derive(Debug)]
@@ -6,8 +7,8 @@ pub struct Lexer<'a> {
     streamer: ZeroCopyStreamer<'a>,
     catcodes: Catcodes,
     // Used by `peek_next` function.
-    peeked: VecDeque<LexerElem<'a>>,
-    peek_offset: usize,
+    peeked: RefCell<VecDeque<LexerElem<'a>>>,
+    peek_offset: Cell<usize>,
 }
 
 
@@ -16,38 +17,42 @@ impl<'a> Lexer<'a> {
         Lexer {
             streamer: ZeroCopyStreamer::new(input),
             catcodes: Catcodes::default(),
-            peeked: VecDeque::new(),
-            peek_offset: 0,
+            peeked: RefCell::new(VecDeque::new()),
+            peek_offset: Cell::new(0),
         }
     }
 
-    pub fn next(&mut self) -> LexerElem<'a> {
+    pub fn next(&self) -> LexerElem<'a> {
         self.reset_peek();
 
-        if self.peeked.is_empty() {
+        if self.peeked.borrow().is_empty() {
             self.tokenize_element()
         } else {
-            self.peeked.pop_front().unwrap()
+            self.peeked.borrow_mut().pop_front().unwrap()
         }
     }
 
-    pub fn peek_next(&mut self) -> &Elem<'a> {
-        if self.peek_offset == self.peeked.len() {
-            self.peek_offset += 1;
+    pub fn peek_next(&self) -> Elem<'a> {
+        if self.peek_offset.get() == self.peeked.borrow().len() {
+            self.peek_offset.set(self.peek_offset.get() + 1);
             // Get the newest token.
             let token = self.tokenize_element();
-            self.peeked.push_back(token);
-            self.peeked.back().unwrap().elem()
-        } else if self.peek_offset < self.peeked.len() {
-            self.peek_offset += 1;
-            self.peeked.get(self.peek_offset - 1).unwrap().elem()
+            self.peeked.borrow_mut().push_back(token);
+
+            let peeked = self.peeked.borrow();
+            peeked.back().unwrap().elem().clone()
+        } else if self.peek_offset.get() < self.peeked.borrow().len() {
+            self.peek_offset.set(self.peek_offset.get() + 1);
+
+            let peeked = self.peeked.borrow();
+            peeked.get(self.peek_offset.get() - 1).unwrap().elem().clone()
         } else {
             unreachable!();
         }
     }
 
-    pub fn reset_peek(&mut self) {
-        self.peek_offset = 0;
+    pub fn reset_peek(&self) {
+        self.peek_offset.set(0);
     }
 
     pub fn set_catcode(&mut self, code: usize, value: char) {
