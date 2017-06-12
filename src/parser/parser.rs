@@ -34,12 +34,11 @@ impl<'a> Parser<'a> {
                 let out = int.interpret(token.elem(),
                                         &mut result,
                                         &mut self.lexer,
-                                        &mut self.context);
+                                        &mut self.context)?;
                 match out {
-                    Ok(InterpreterOutput::Stop) => break 'main,
-                    Ok(InterpreterOutput::Matched) => break 'int,
-                    Ok(_) => continue,
-                    Err(err) => return Err(err),
+                    InterpreterOutput::Stop => break 'main,
+                    InterpreterOutput::Matched => break 'int,
+                    _ => continue,
                 }
             }
         }
