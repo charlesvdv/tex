@@ -4,6 +4,8 @@ pub mod errors;
 mod models;
 mod context;
 mod parser;
+#[macro_use]
+mod macros;
 
 // Parsing interpreter.
 pub mod comment;

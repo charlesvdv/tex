@@ -6,6 +6,7 @@ use lexer::Position;
 #[derive(Debug, PartialEq, Eq)]
 pub enum ErrorType {
     EscapedChar(char),
+    MacroDefinition,
 }
 
 #[derive(Debug)]

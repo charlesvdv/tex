@@ -7,11 +7,11 @@ pub enum ParserElem {
 #[derive(Debug)]
 pub struct Command {
     name: String,
-    parameter: Option<Vec<CommandParam>>,
+    parameter: Option<Vec<MacroDefParam>>,
 }
 
 #[derive(Debug)]
-pub enum CommandParam {
+pub enum MacroDefParam {
     Parameter(u32),
     Delimiter(String),
 }
