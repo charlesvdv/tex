@@ -31,16 +31,16 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn peek_next(&mut self) -> &LexerElem<'a> {
+    pub fn peek_next(&mut self) -> &Elem<'a> {
         if self.peek_offset == self.peeked.len() {
             self.peek_offset += 1;
             // Get the newest token.
             let token = self.tokenize_element();
             self.peeked.push_back(token);
-            self.peeked.back().unwrap()
+            self.peeked.back().unwrap().elem()
         } else if self.peek_offset < self.peeked.len() {
             self.peek_offset += 1;
-            self.peeked.get(self.peek_offset - 1).unwrap()
+            self.peeked.get(self.peek_offset - 1).unwrap().elem()
         } else {
             unreachable!();
         }

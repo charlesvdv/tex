@@ -60,13 +60,13 @@ fn test_peek_next() {
                     LexerElem::new(Elem::EndOfFile, Position::new(1, 30))];
 
     for d in &data {
-        assert_eq!(lexer.peek_next(), d);
+        assert_eq!(lexer.peek_next(), d.elem());
     }
 
     lexer.reset_peek();
 
     for d in &data {
-        assert_eq!(lexer.peek_next(), d);
+        assert_eq!(lexer.peek_next(), d.elem());
     }
 
     for d in data {

@@ -29,11 +29,10 @@ impl ParsingInterpreter for TextInterpreter {
         loop {
             {
                 let next = lexer.peek_next();
-                match next.elem() {
+                match next {
                     &lexer::Elem::Text(v) => txt.push_str(v),
                     &lexer::Elem::LineBreak => txt.push('\n'),
                     _ => break,
-
                 }
             }
             // Consume the text we just added.
