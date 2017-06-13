@@ -2,6 +2,7 @@ use lexer;
 
 pub mod errors;
 mod models;
+mod group;
 mod context;
 mod parser;
 #[macro_use]
