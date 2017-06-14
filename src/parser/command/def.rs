@@ -1,6 +1,6 @@
 use lexer;
 use parser::{ParseResult, ParserElem, ParserContext, ParsingInterpreter, InterpreterOutput,
-             MacroDefParam};
+             MacroDefinition, MacroDefParam, MacroDefBody};
 use parser::command::SpecificCommandInterpreter;
 use parser::errors::{ParserError, ErrorType};
 
@@ -112,6 +112,16 @@ impl SpecificCommandInterpreter for MacroDefinitionInterpreter {
             lexer::Elem::BeginGroup => (None, self.macro_body(lexer)?),
             _ => (Some(self.macro_param(lexer)?), self.macro_body(lexer)?),
         };
+
+        // Create the object and save it in the current group.
+        // TODO: handle expansion when the macro is defined with `edef`.
+        let macro_def = MacroDefinition {
+            name: name.into(),
+            parameters: params,
+            body: MacroDefBody::Raw(body),
+        };
+
+        ctx.get_default_scope().add_macro_def(macro_def);
 
         Ok(InterpreterOutput::Matched)
     }
