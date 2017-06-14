@@ -41,8 +41,6 @@ pub enum Elem<'a> {
     SubScript,
     Active,
     MacroParam,
-
-    Char(char),
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
