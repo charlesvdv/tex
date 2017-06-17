@@ -5,6 +5,7 @@ pub mod errors;
 pub mod models;
 
 // Interpreters.
+pub mod comment;
 pub mod text;
 pub mod command;
 
@@ -50,9 +51,14 @@ pub trait InterpretersLauncher {
         let mut matched = false;
 
         for interpreter in self.get_interpreters() {
+            // Reset peek each time we check for a match.
+            lexer.reset_peek();
             if !interpreter.matching(&*lexer) {
                 continue;
             }
+            // Reset peek after we have a match.
+            lexer.reset_peek();
+
             matched = true;
             match interpreter.run(out, lexer, ctx)? {
                 Some(InterpreterOutput::Stop) => return Ok(Some(InterpreterOutput::Stop)),
@@ -61,8 +67,8 @@ pub trait InterpretersLauncher {
         }
 
         if !matched {
-            return Err(ParsingError {});
             // TODO: return error that we didn't match any interpreter.
+            return Err(ParsingError {});
         }
         Ok(None)
     }

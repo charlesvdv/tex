@@ -16,3 +16,4 @@ macro_rules! generate_test {
 
 generate_test!(simple);
 generate_test!(simple_multiline);
+generate_test!(comment);

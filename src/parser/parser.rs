@@ -2,6 +2,7 @@ use lexer::Lexer;
 use parser::{Context, ParsingResult, TeXToken, ParsingInterpreter, InterpreterOutput,
              InterpretersLauncher};
 
+use parser::comment::CommentInterpreter;
 use parser::text::TextInterpreter;
 use parser::command::CommandInterpreter;
 
@@ -56,8 +57,9 @@ impl Default for TopParserInterpreter {
     fn default() -> Self {
         TopParserInterpreter {
             interpreters: vec![
-                Box::new(TextInterpreter::new()),
+                Box::new(CommentInterpreter::new()),
                 Box::new(CommandInterpreter::default()),
+                Box::new(TextInterpreter::new()),
             ],
         }
     }

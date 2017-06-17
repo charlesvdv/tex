@@ -22,6 +22,7 @@ pub fn test_parser(tex_file: &str) {
     fs::create_dir_all(OUTPUT_FOLDER).unwrap();
 
     generate_parsed_tex(tex_file);
+    println!("tex file parsed and reformatted.");
 
     execute_tex(&get_input_tex_path(tex_file));
     execute_tex(&get_output_file(

@@ -46,7 +46,6 @@ impl ParsingInterpreter for TextInterpreter {
         let mut txt = self.init_text(out);
         loop {
             if !self.matching(lexer) {
-                lexer.reset_peek();
                 break;
             }
 
