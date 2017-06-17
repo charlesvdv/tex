@@ -1,25 +1,29 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LexerElem<'a> {
-    elem: Elem<'a>,
+pub struct LexerToken<'a> {
+    elem: Token<'a>,
     pos: Position,
 }
 
-impl<'a> LexerElem<'a> {
-    pub fn new(elem: Elem<'a>, pos: Position) -> Self {
-        LexerElem { elem, pos }
+impl<'a> LexerToken<'a> {
+    pub fn new(elem: Token<'a>, pos: Position) -> Self {
+        LexerToken { elem, pos }
     }
 
-    pub fn elem(&self) -> &Elem<'a> {
+    pub fn elem(&self) -> &Token<'a> {
         &self.elem
     }
 
     pub fn position(&self) -> &Position {
         &self.pos
     }
+
+    pub fn consume(self) -> (Token<'a>, Position) {
+        (self.elem, self.pos)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Elem<'a> {
+pub enum Token<'a> {
     Text(&'a str),
     Command(&'a str),
     Comment(&'a str),
@@ -37,8 +41,6 @@ pub enum Elem<'a> {
     SubScript,
     Active,
     MacroParam,
-
-    Char(char),
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]

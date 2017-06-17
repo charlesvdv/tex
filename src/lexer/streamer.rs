@@ -31,8 +31,8 @@ impl<'a> ZeroCopyStreamer<'a> {
 
     pub fn peek_char(&self) -> Option<char> {
         match self.input[self.offset.get() + self.peek_offset.get()..]
-                  .chars()
-                  .next() {
+            .chars()
+            .next() {
             Some(v) => {
                 self.peek_offset.set(self.peek_offset.get() + v.len_utf8());
                 Some(v)
@@ -42,7 +42,8 @@ impl<'a> ZeroCopyStreamer<'a> {
     }
 
     pub fn take_while<P>(&self, predicate: P) -> &'a str
-        where P: Fn(char) -> bool
+    where
+        P: Fn(char) -> bool,
     {
         // Reset peek_offset before consuming.
         self.peek_offset.set(0);

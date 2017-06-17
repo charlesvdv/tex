@@ -8,38 +8,37 @@ fn test_normal_lexer() {
 
     let lexer = Lexer::new(input);
 
-    let data = vec![LexerElem::new(Elem::Text("foo bar "), Position::new(0, 0)),
-                    LexerElem::new(Elem::EscapedChar('{'), Position::new(0, 8)),
-                    LexerElem::new(Elem::Space, Position::new(0, 10)),
-                    LexerElem::new(Elem::SpecialChar('-'), Position::new(0, 11)),
-                    LexerElem::new(Elem::LineBreak, Position::new(0, 12)),
-                    LexerElem::new(Elem::Command("bar"), Position::new(1, 0)),
-                    LexerElem::new(Elem::Space, Position::new(1, 4)),
-                    LexerElem::new(Elem::Command("foo"), Position::new(1, 5)),
-                    LexerElem::new(Elem::BeginGroup, Position::new(1, 9)),
-                    LexerElem::new(Elem::Text("bar"), Position::new(1, 10)),
-                    LexerElem::new(Elem::EndGroup, Position::new(1, 13)),
-                    LexerElem::new(Elem::LineBreak, Position::new(1, 14)),
-                    LexerElem::new(Elem::Command("def"), Position::new(2, 0)),
-                    LexerElem::new(Elem::Space, Position::new(2, 4)),
-                    LexerElem::new(Elem::Command("foo"), Position::new(2, 5)),
-                    LexerElem::new(Elem::Space, Position::new(2, 9)),
-                    LexerElem::new(Elem::MacroParam, Position::new(2, 10)),
-                    LexerElem::new(Elem::Number(1), Position::new(2, 11)),
-                    LexerElem::new(Elem::Text("v"), Position::new(2, 12)),
-                    LexerElem::new(Elem::MacroParam, Position::new(2, 13)),
-                    LexerElem::new(Elem::Number(2), Position::new(2, 14)),
-                    LexerElem::new(Elem::BeginGroup, Position::new(2, 15)),
-                    LexerElem::new(Elem::Text("bar"), Position::new(2, 16)),
-                    LexerElem::new(Elem::EndGroup, Position::new(2, 19)),
-                    LexerElem::new(Elem::EndOfFile, Position::new(2, 20))];
+    let data = vec![
+        LexerToken::new(Token::Text("foo bar "), Position::new(0, 0)),
+        LexerToken::new(Token::EscapedChar('{'), Position::new(0, 8)),
+        LexerToken::new(Token::Space, Position::new(0, 10)),
+        LexerToken::new(Token::SpecialChar('-'), Position::new(0, 11)),
+        LexerToken::new(Token::LineBreak, Position::new(0, 12)),
+        LexerToken::new(Token::Command("bar"), Position::new(1, 0)),
+        LexerToken::new(Token::Space, Position::new(1, 4)),
+        LexerToken::new(Token::Command("foo"), Position::new(1, 5)),
+        LexerToken::new(Token::BeginGroup, Position::new(1, 9)),
+        LexerToken::new(Token::Text("bar"), Position::new(1, 10)),
+        LexerToken::new(Token::EndGroup, Position::new(1, 13)),
+        LexerToken::new(Token::LineBreak, Position::new(1, 14)),
+        LexerToken::new(Token::Command("def"), Position::new(2, 0)),
+        LexerToken::new(Token::Space, Position::new(2, 4)),
+        LexerToken::new(Token::Command("foo"), Position::new(2, 5)),
+        LexerToken::new(Token::Space, Position::new(2, 9)),
+        LexerToken::new(Token::MacroParam, Position::new(2, 10)),
+        LexerToken::new(Token::Number(1), Position::new(2, 11)),
+        LexerToken::new(Token::Text("v"), Position::new(2, 12)),
+        LexerToken::new(Token::MacroParam, Position::new(2, 13)),
+        LexerToken::new(Token::Number(2), Position::new(2, 14)),
+        LexerToken::new(Token::BeginGroup, Position::new(2, 15)),
+        LexerToken::new(Token::Text("bar"), Position::new(2, 16)),
+        LexerToken::new(Token::EndGroup, Position::new(2, 19)),
+        LexerToken::new(Token::EndOfFile, Position::new(2, 20)),
+    ];
 
     for d in data {
-        assert_eq!(lexer.next(), d);
+        assert_eq!(lexer.next(), Some(d));
     }
-
-    assert_eq!(lexer.next(),
-               LexerElem::new(Elem::EndOfFile, Position::new(2, 20)));
 }
 
 #[test]
@@ -49,27 +48,66 @@ fn test_peek_next() {
 
     let lexer = Lexer::new(input);
 
-    let data = vec![LexerElem::new(Elem::Command("foo"), Position::new(0, 0)),
-                    LexerElem::new(Elem::Text(" a string"), Position::new(0, 4)),
-                    LexerElem::new(Elem::Command("bar"), Position::new(0, 13)),
-                    LexerElem::new(Elem::LineBreak, Position::new(0, 17)),
-                    LexerElem::new(Elem::BeginGroup, Position::new(1, 0)),
-                    LexerElem::new(Elem::Text("a string enclosed by a group"),
-                                   Position::new(1, 1)),
-                    LexerElem::new(Elem::EndGroup, Position::new(1, 29)),
-                    LexerElem::new(Elem::EndOfFile, Position::new(1, 30))];
+    let data = vec![
+        LexerToken::new(Token::Command("foo"), Position::new(0, 0)),
+        LexerToken::new(Token::Text(" a string"), Position::new(0, 4)),
+        LexerToken::new(Token::Command("bar"), Position::new(0, 13)),
+        LexerToken::new(Token::LineBreak, Position::new(0, 17)),
+        LexerToken::new(Token::BeginGroup, Position::new(1, 0)),
+        LexerToken::new(
+            Token::Text("a string enclosed by a group"),
+            Position::new(1, 1)
+        ),
+        LexerToken::new(Token::EndGroup, Position::new(1, 29)),
+        LexerToken::new(Token::EndOfFile, Position::new(1, 30)),
+    ];
 
     for d in &data {
-        assert_eq!(lexer.peek_next(), *d.elem());
+        assert_eq!(lexer.peek_next().unwrap(), *d.elem());
     }
 
     lexer.reset_peek();
 
     for d in &data {
-        assert_eq!(lexer.peek_next(), *d.elem());
+        assert_eq!(lexer.peek_next().unwrap(), *d.elem());
     }
 
     for d in data {
-        assert_eq!(lexer.next(), d);
+        assert_eq!(lexer.next().unwrap(), d);
     }
+}
+
+#[test]
+fn test_next_and_peek() {
+    let input = "\\foo a string\\bar
+{a string enclosed by a group}";
+
+    let lexer = Lexer::new(input);
+
+    let data = vec![
+        LexerToken::new(Token::Command("foo"), Position::new(0, 0)),
+        LexerToken::new(Token::Text(" a string"), Position::new(0, 4)),
+        LexerToken::new(Token::Command("bar"), Position::new(0, 13)),
+        LexerToken::new(Token::LineBreak, Position::new(0, 17)),
+        LexerToken::new(Token::BeginGroup, Position::new(1, 0)),
+        LexerToken::new(
+            Token::Text("a string enclosed by a group"),
+            Position::new(1, 1)
+        ),
+        LexerToken::new(Token::EndGroup, Position::new(1, 29)),
+        LexerToken::new(Token::EndOfFile, Position::new(1, 30)),
+    ];
+
+    assert_eq!(lexer.peek_next().unwrap(), *data[0].elem());
+    assert_eq!(lexer.peek_next().unwrap(), *data[1].elem());
+
+    assert_eq!(lexer.next().unwrap(), data[0]);
+
+    assert_eq!(lexer.peek_next().unwrap(), *data[1].elem());
+    assert_eq!(lexer.peek_next().unwrap(), *data[2].elem());
+
+    lexer.reset_peek();
+
+    assert_eq!(lexer.peek_next().unwrap(), *data[1].elem());
+    assert_eq!(lexer.peek_next().unwrap(), *data[2].elem());
 }
