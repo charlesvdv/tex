@@ -1,17 +1,5 @@
-#[derive(Debug)]
-pub enum ParserElem {
+/// Define high level structure that the parser will output.
+pub enum TeXToken {
     Text(String),
-    Command(Command),
-}
-
-#[derive(Debug)]
-pub struct Command {
-    name: String,
-    parameter: Option<Vec<CommandParam>>,
-}
-
-#[derive(Debug)]
-pub enum CommandParam {
-    Parameter(u32),
-    Delimiter(String),
+    BS,
 }

@@ -1,47 +1,64 @@
-use parser::context::ParserContext;
-use parser::models::ParserElem;
 use lexer::Lexer;
-use parser::{ParsingInterpreter, InterpreterOutput, ParseResult};
+use parser::{Context, ParsingResult, TeXToken, ParsingInterpreter, InterpreterOutput,
+             InterpretersLauncher};
 
-use parser::comment::CommentInterpreter;
-use parser::text::{TextInterpreter, EscapeCharInterpreter};
+use parser::text::TextInterpreter;
 use parser::command::CommandInterpreter;
-
 
 pub struct Parser<'a> {
     lexer: Lexer<'a>,
-    context: ParserContext,
-    interpreters: Vec<Box<ParsingInterpreter>>,
+    ctx: Context,
 }
 
 impl<'a> Parser<'a> {
     pub fn new(input: &'a str) -> Self {
         Parser {
             lexer: Lexer::new(input),
-            context: ParserContext::new(),
-            interpreters: vec![Box::new(CommentInterpreter::new()),
-                               Box::new(TextInterpreter::new()),
-                               Box::new(CommandInterpreter::new()),
-                               Box::new(EscapeCharInterpreter::new())],
+            ctx: Context::new(),
         }
     }
 
-    pub fn parse(&mut self) -> ParseResult<Vec<ParserElem>> {
-        let mut result = vec![];
-        'main: loop {
-            let token = self.lexer.next();
-            'int: for int in &self.interpreters {
-                let out = int.interpret(token.elem(),
-                                        &mut result,
-                                        &mut self.lexer,
-                                        &mut self.context)?;
-                match out {
-                    InterpreterOutput::Stop => break 'main,
-                    InterpreterOutput::Matched => break 'int,
-                    _ => continue,
-                }
+    pub fn parse(&mut self) -> ParsingResult<Vec<TeXToken>> {
+        let handler = TopParserInterpreter::default();
+        let mut out = vec![];
+
+        match handler.launch_interpreters(
+            &mut out,
+            &mut self.lexer,
+            &mut self.ctx,
+        )? {
+            Some(InterpreterOutput::Stop) => (),
+            _ => {
+                // TODO: return error.
             }
         }
-        Ok(result)
+        Ok(out)
+    }
+}
+
+pub struct TopParserInterpreter {
+    interpreters: Vec<Box<ParsingInterpreter>>,
+}
+
+impl TopParserInterpreter {
+    pub fn new() -> Self {
+        TopParserInterpreter { interpreters: vec![] }
+    }
+}
+
+impl InterpretersLauncher for TopParserInterpreter {
+    fn get_interpreters(&self) -> &Vec<Box<ParsingInterpreter>> {
+        &self.interpreters
+    }
+}
+
+impl Default for TopParserInterpreter {
+    fn default() -> Self {
+        TopParserInterpreter {
+            interpreters: vec![
+                Box::new(TextInterpreter::new()),
+                Box::new(CommandInterpreter::default()),
+            ],
+        }
     }
 }

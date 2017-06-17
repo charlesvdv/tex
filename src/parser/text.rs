@@ -1,90 +1,66 @@
-use parser::{ParseResult, ParserElem, ParserContext, ParsingInterpreter, InterpreterOutput};
-use parser::context::ContextMode;
-use parser::errors::{ParserError, ErrorType};
 use lexer;
+use lexer::LexTokenIterator;
+use parser::{ParsingInterpreter, TeXToken, Context, ParsingResult, InterpreterOutput};
 
-// Handles also the LineBreak for now.
+/// Should be in the last interpreter as it takes a lot of differents tokens.
 pub struct TextInterpreter {}
 
 impl TextInterpreter {
     pub fn new() -> Self {
         TextInterpreter {}
     }
+
+    fn init_text(&self, out: &mut Vec<TeXToken>) -> String {
+        if out.is_empty() {
+            return String::new();
+        }
+
+        // Check if the last token is text or not.
+        let last_token = out.pop().unwrap();
+        if let TeXToken::Text(v) = last_token {
+            return v;
+        } else {
+            out.push(last_token);
+        }
+
+        String::new()
+    }
 }
 
 impl ParsingInterpreter for TextInterpreter {
-    fn interpret(&self,
-                 token: &lexer::Elem,
-                 result: &mut Vec<ParserElem>,
-                 lexer: &mut lexer::Lexer,
-                 _: &mut ParserContext)
-                 -> ParseResult<InterpreterOutput> {
-        let txt = match token {
-            &lexer::Elem::Text(v) => v,
-            &lexer::Elem::LineBreak => "\n",
-            _ => return Ok(InterpreterOutput::NoMatch),
-        };
-        let mut txt = String::from(txt);
+    fn matching(&self, lexer: &LexTokenIterator) -> bool {
+        match lexer.peek_next() {
+            Some(lexer::Token::Text(_)) => true,
+            Some(lexer::Token::LineBreak) => true,
+            Some(lexer::Token::Space) => true,
+            _ => false,
+        }
+    }
 
+    fn run(
+        &self,
+        out: &mut Vec<TeXToken>,
+        lexer: &mut LexTokenIterator,
+        _: &mut Context,
+    ) -> ParsingResult<Option<InterpreterOutput>> {
+        let mut txt = self.init_text(out);
         loop {
-            {
-                let next = lexer.peek_next();
-                match next {
-                    lexer::Elem::Text(v) => txt.push_str(v),
-                    lexer::Elem::LineBreak => txt.push('\n'),
-                    _ => break,
-                }
+            if !self.matching(lexer) {
+                lexer.reset_peek();
+                break;
             }
-            // Consume the text we just added.
-            lexer.next();
-        }
 
-        result.push(ParserElem::Text(txt));
-
-        Ok(InterpreterOutput::Matched)
-    }
-}
-
-pub struct EscapeCharInterpreter {}
-
-impl EscapeCharInterpreter {
-    pub fn new() -> Self {
-        EscapeCharInterpreter {}
-    }
-}
-
-impl ParsingInterpreter for EscapeCharInterpreter {
-    fn interpret(&self,
-                 token: &lexer::Elem,
-                 result: &mut Vec<ParserElem>,
-                 _: &mut lexer::Lexer,
-                 ctx: &mut ParserContext)
-                 -> ParseResult<InterpreterOutput> {
-        let ch = match token {
-            &lexer::Elem::EscapedChar(v) => v,
-            _ => return Ok(InterpreterOutput::NoMatch),
-        };
-
-        // TODO: if ~ is in front of a letter, it creates a specific accent.
-        let normal_ch_escape = ['%', '&', '$', '~', '_'];
-        if normal_ch_escape.contains(&ch) {
-            result.push(ParserElem::Text(ch.to_string()))
-        }
-
-        if ['{', '}'].contains(&ch) {
-            if ctx.mode == ContextMode::Math {
-                result.push(ParserElem::Text(ch.to_string()))
-            } else {
-                return Err(ParserError::new(ErrorType::EscapedChar(ch),
-                                            "`{` or `}` can't be escaped without \
-                                            being inside math mode."));
+            // It is safe to consume as we already checked if this token
+            // was valid.
+            match *lexer.next().unwrap().elem() {
+                lexer::Token::Text(v) => txt.push_str(v),
+                lexer::Token::LineBreak => txt.push('\n'),
+                lexer::Token::Space => txt.push(' '),
+                _ => unreachable!(),
             }
         }
+        out.push(TeXToken::Text(txt));
 
-        if ch == '^' {
-            return Err(ParserError::new(ErrorType::EscapedChar(ch), "escaping ^ is not allowed."));
-        }
-
-        Ok(InterpreterOutput::Matched)
+        Ok(None)
     }
 }
