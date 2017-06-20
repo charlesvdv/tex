@@ -23,11 +23,8 @@ impl<'a> Parser<'a> {
         let handler = TopParserInterpreter::default();
         let mut out = vec![];
 
-        match handler.launch_interpreters(
-            &mut out,
-            &mut self.lexer,
-            &mut self.ctx,
-        )? {
+        match handler
+            .launch_interpreters(&mut out, &mut self.lexer, &mut self.ctx)? {
             Some(InterpreterOutput::Stop) => (),
             _ => {
                 // TODO: return error.
