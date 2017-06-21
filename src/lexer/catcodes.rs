@@ -20,9 +20,9 @@ macro_rules! catcode_test {
 ///
 /// The purpose of this struct is to keep track of these changes
 /// and have a clean interface for the lexer.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Catcodes {
-    codes: [Vec<char>; 16],
+    codes: Vec<Vec<char>>,
 }
 
 impl Catcodes {
@@ -82,7 +82,7 @@ impl Catcodes {
 impl Default for Catcodes {
     fn default() -> Self {
         Catcodes {
-            codes: [
+            codes: vec![
                     vec!['\\'],
                     vec!['{'],
                     vec!['}'],
