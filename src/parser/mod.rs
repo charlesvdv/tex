@@ -3,11 +3,15 @@ pub mod parser;
 pub mod context;
 pub mod errors;
 pub mod models;
+pub mod scope;
+#[macro_use]
+mod macros;
 
 // Interpreters.
 pub mod comment;
 pub mod text;
 pub mod command;
+pub mod char;
 
 pub use self::errors::ParsingError;
 pub use self::context::Context;
@@ -16,6 +20,27 @@ pub use self::parser::Parser;
 
 type ParsingResult<T> = Result<T, ParsingError>;
 
+// TODO: for now `SpecificInterpreter` and `ParsingInterpreter` could be combined somehow.
+
+/// A specific interpreter that should not be called by the Parser directly but
+/// should be called by an interpreter to get a specific parsed value.
+///
+/// This kind of parser can't access the parsed result.
+pub trait SpecificInterpreter {
+    type Out;
+
+    /// Check if the interpreter will match for the input.
+    fn matching(&self, lexer: &LexTokenIterator) -> bool;
+
+    /// Execute the logic inside the interpreter.
+    ///
+    /// Run the interpreter. We should check if the interpreter match before
+    /// calling this function.
+    fn run(&self, lexer: &mut LexTokenIterator, ctx: &mut Context) -> ParsingResult<Self::Out>;
+}
+
+/// Interpreter called by an object implementing `InterpretersLauncher` and output
+/// an `InterpreterOutput` result when run.
 pub trait ParsingInterpreter {
     /// Check if the interpreter will match for the input.
     fn matching(&self, lexer: &LexTokenIterator) -> bool;
@@ -67,6 +92,7 @@ pub trait InterpretersLauncher {
         }
 
         if !matched {
+            lexer.reset_peek();
             return Err(ParsingError::new(&format!(
                 "No interpreter matched for token: {:?}",
                 lexer.peek_next()

@@ -8,6 +8,7 @@ mod macros;
 
 // Interpreters.
 pub mod quit;
+pub mod catcode;
 
 pub struct CommandInterpreter {
     interpreters: Vec<Box<ParsingInterpreter>>,
@@ -22,7 +23,12 @@ impl CommandInterpreter {
 
 impl Default for CommandInterpreter {
     fn default() -> Self {
-        CommandInterpreter { interpreters: vec![Box::new(quit::QuitCommandInterpreter::new())] }
+        CommandInterpreter {
+            interpreters: vec![
+                Box::new(quit::QuitCommandInterpreter::new()),
+                Box::new(catcode::CatcodeCommandInterpreter::new()),
+            ],
+        }
     }
 }
 
@@ -40,7 +46,6 @@ impl ParsingInterpreter for CommandInterpreter {
         lexer: &mut LexTokenIterator,
         ctx: &mut Context,
     ) -> ParsingResult<Option<InterpreterOutput>> {
-        lexer.reset_peek();
         self.launch_interpreters_once(out, lexer, ctx)
     }
 }

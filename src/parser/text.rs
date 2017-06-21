@@ -33,6 +33,7 @@ impl ParsingInterpreter for TextInterpreter {
             Some(lexer::Token::Text(_)) => true,
             Some(lexer::Token::LineBreak) => true,
             Some(lexer::Token::Space) => true,
+            Some(lexer::Token::SpecialChar(_)) => true,
             _ => false,
         }
     }
@@ -64,6 +65,7 @@ impl ParsingInterpreter for TextInterpreter {
                     }
                 }
                 lexer::Token::Space => txt.push(' '),
+                lexer::Token::SpecialChar(v) => txt.push(v),
                 _ => unreachable!(),
             }
         }
