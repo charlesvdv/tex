@@ -156,7 +156,7 @@ impl<'a> Lexer<'a> {
                 Token::SpecialChar(v)
             }
             Some(v) if self.catcodes.is_letter(v) => {
-                Token::Command(self.streamer.take_while(|x| self.catcodes.is_letter(x)))
+                Token::Command(self.streamer.take_while(|x| x.is_alphabetic()))
             }
             _ => unreachable!(),
         }
@@ -171,9 +171,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn text(&self) -> &'a str {
-        self.streamer.take_while(|x| {
-            !self.catcodes.is_control_sequence(x) && !self.catcodes.is_end_of_line(x) &&
-                !self.catcodes.is_escaped_char(x)
-        })
+        self.streamer
+            .take_while(|x| self.catcodes.is_letter(x) || self.catcodes.is_space(x))
     }
 }
