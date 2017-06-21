@@ -15,4 +15,5 @@ pub trait LexTokenIterator<'a> {
     fn next(&self) -> Option<LexerToken<'a>>;
     fn peek_next(&self) -> Option<Token<'a>>;
     fn reset_peek(&self);
+    fn set_catcode(&mut self, catcodes: Catcodes);
 }

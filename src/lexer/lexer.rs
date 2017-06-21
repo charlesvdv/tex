@@ -53,6 +53,10 @@ impl<'a> LexTokenIterator<'a> for Lexer<'a> {
     fn reset_peek(&self) {
         self.peek_offset.set(0);
     }
+
+    fn set_catcode(&mut self, catcodes: Catcodes) {
+        self.catcodes = catcodes;
+    }
 }
 
 impl<'a> Lexer<'a> {
@@ -63,10 +67,6 @@ impl<'a> Lexer<'a> {
             peeked: RefCell::new(VecDeque::new()),
             peek_offset: Cell::new(0),
         }
-    }
-
-    pub fn set_catcode(&mut self, code: usize, value: char) {
-        self.catcodes.set_catcode(code, value);
     }
 
     fn tokenize_element(&self) -> LexerToken<'a> {
@@ -156,9 +156,7 @@ impl<'a> Lexer<'a> {
                 Token::SpecialChar(v)
             }
             Some(v) if self.catcodes.is_letter(v) => {
-                Token::Command(self.streamer.take_while(|x| {
-                    self.catcodes.is_letter(x) || self.catcodes.is_other_character(x)
-                }))
+                Token::Command(self.streamer.take_while(|x| self.catcodes.is_letter(x)))
             }
             _ => unreachable!(),
         }
