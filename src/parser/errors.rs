@@ -19,12 +19,12 @@ impl ParsingError {
         }
     }
 
-    pub fn position(&mut self, pos: Position) -> &mut Self {
+    pub fn position(mut self, pos: Position) -> Self {
         self.pos = Some(pos);
         self
     }
 
-    pub fn error_type(&mut self, err_type: ErrorType) -> &mut Self {
+    pub fn error_type(mut self, err_type: ErrorType) -> Self {
         self.err_type = Some(err_type);
         self
     }
