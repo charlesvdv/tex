@@ -17,7 +17,7 @@ impl TextInterpreter {
 
         // Check if the last token is text or not.
         let last_token = out.pop().unwrap();
-        if let TeXToken::Text(v) = last_token {
+        if let TeXToken::Paragraph(v) = last_token {
             return v;
         } else {
             out.push(last_token);
@@ -69,7 +69,7 @@ impl ParsingInterpreter for TextInterpreter {
                 _ => unreachable!(),
             }
         }
-        out.push(TeXToken::Text(txt));
+        out.push(TeXToken::Paragraph(txt));
 
         Ok(None)
     }

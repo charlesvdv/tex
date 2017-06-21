@@ -7,7 +7,7 @@ pub fn format(parser_output: &Vec<TeXToken>) -> String {
     let mut out = String::new();
     for elem in parser_output {
         match elem {
-            &TeXToken::Text(ref v) => {
+            &TeXToken::Paragraph(ref v) => {
                 out.push_str(&escape_str(v));
             }
             _ => continue,

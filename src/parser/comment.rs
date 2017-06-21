@@ -31,7 +31,7 @@ impl ParsingInterpreter for CommentInterpreter {
         // on the end of a line to see if we need to consume or not the linebreak.
         match out.last() {
             Some(v) => {
-                if let &TeXToken::Text(ref t) = v {
+                if let &TeXToken::Paragraph(ref t) = v {
                     if let Some(ch) = t.chars().last() {
                         if ch == '\n' {
                             // Consume the linebreak.
