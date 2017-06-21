@@ -45,6 +45,7 @@ impl ParsingInterpreter for TextInterpreter {
     ) -> ParsingResult<Option<InterpreterOutput>> {
         let mut txt = self.init_text(out);
         loop {
+            lexer.reset_peek();
             if !self.matching(lexer) {
                 break;
             }
@@ -53,7 +54,15 @@ impl ParsingInterpreter for TextInterpreter {
             // was valid.
             match *lexer.next().unwrap().elem() {
                 lexer::Token::Text(v) => txt.push_str(v),
-                lexer::Token::LineBreak => txt.push('\n'),
+                lexer::Token::LineBreak => {
+                    if let Some(lexer::Token::LineBreak) = lexer.peek_next() {
+                        // Consume line break.
+                        lexer.next();
+                        txt.push('\n');
+                    } else {
+                        txt.push(' ');
+                    }
+                }
                 lexer::Token::Space => txt.push(' '),
                 _ => unreachable!(),
             }

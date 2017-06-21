@@ -13,7 +13,7 @@ pub fn format(parser_output: &Vec<TeXToken>) -> String {
             _ => continue,
         }
     }
-    out.push_str("\\bye");
+    out.push_str("\n\\bye");
     out
 }
 
