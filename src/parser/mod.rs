@@ -67,8 +67,10 @@ pub trait InterpretersLauncher {
         }
 
         if !matched {
-            // TODO: return error that we didn't match any interpreter.
-            return Err(ParsingError {});
+            return Err(ParsingError::new(&format!(
+                "No interpreter matched for token: {:?}",
+                lexer.peek_next()
+            )));
         }
         Ok(None)
     }
