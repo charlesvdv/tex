@@ -59,7 +59,10 @@ impl ParsingInterpreter for TextInterpreter {
                     if let Some(lexer::Token::LineBreak) = lexer.peek_next() {
                         // Consume line break.
                         lexer.next();
-                        txt.push('\n');
+
+                        // Create a new paragraph and reset the `txt` variable.
+                        out.push(TeXToken::Paragraph(txt));
+                        txt = String::new();
                     } else {
                         txt.push(' ');
                     }

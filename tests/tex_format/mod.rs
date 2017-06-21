@@ -9,6 +9,7 @@ pub fn format(parser_output: &Vec<TeXToken>) -> String {
         match elem {
             &TeXToken::Paragraph(ref v) => {
                 out.push_str(&escape_str(v));
+                out.push_str("\n\n");
             }
             _ => continue,
         }
