@@ -1,0 +1,16 @@
+% Test groups using catcodes.
+% We need to set a new paragraph before `~` character otherwise
+% tex put a mini-space before it. TODO: why?
+{
+    \catcode`\%=12
+    % not a comment
+    {
+
+
+        \catcode`\~=11
+        ~ this is no longer an active character
+        % and not a comment again
+    }
+}
+% this is a comment.
+\bye

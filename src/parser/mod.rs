@@ -12,6 +12,7 @@ pub mod comment;
 pub mod text;
 pub mod command;
 pub mod char;
+pub mod groups;
 
 pub use self::errors::ParsingError;
 pub use self::context::Context;

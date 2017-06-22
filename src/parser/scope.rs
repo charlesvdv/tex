@@ -15,6 +15,15 @@ impl Groups {
         }
     }
 
+    pub fn push_scope(&mut self) {
+        let new_scope = self.stack.last().unwrap().clone();
+        self.stack.push(new_scope);
+    }
+
+    pub fn pop_scope(&mut self) {
+        self.stack.pop();
+    }
+
     pub fn set_default_scope(&mut self, default_scope: DefaultScope) {
         self.default = default_scope;
     }
@@ -63,6 +72,7 @@ pub enum DefaultScope {
 }
 
 /// Hold information about one scope.
+#[derive(Clone)]
 struct ScopeHolder {
     catcodes: Catcodes,
 }

@@ -5,6 +5,7 @@ use parser::{Context, ParsingResult, TeXToken, ParsingInterpreter, InterpreterOu
 use parser::comment::CommentInterpreter;
 use parser::text::TextInterpreter;
 use parser::command::CommandInterpreter;
+use parser::groups::{BeginGroupInterpreter, EndGroupInterpreter};
 
 pub struct Parser<'a> {
     lexer: Lexer<'a>,
@@ -54,6 +55,8 @@ impl Default for TopParserInterpreter {
     fn default() -> Self {
         TopParserInterpreter {
             interpreters: vec![
+                Box::new(BeginGroupInterpreter::new()),
+                Box::new(EndGroupInterpreter::new()),
                 Box::new(CommentInterpreter::new()),
                 Box::new(CommandInterpreter::default()),
                 Box::new(TextInterpreter::new()),
