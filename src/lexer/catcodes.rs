@@ -83,23 +83,23 @@ impl Default for Catcodes {
     fn default() -> Self {
         Catcodes {
             codes: vec![
-                    vec!['\\'],
-                    vec!['{'],
-                    vec!['}'],
-                    vec!['$'],
-                    vec!['&'],
-                    vec!['\n', 10 as char], // 10 is the Vertical Tab ASCII character
-                    vec!['#'],
-                    vec!['^'],
-                    vec!['_'],
-                    vec![0 as char], // ASCII null
-                    vec![' ', 13 as char], // 13 is the Horizontal Tab ASCII character
-                    generate_alpha(),
-                    vec!['@'], // And others...
-                    vec!['~'],
-                    vec!['%'],
-                    vec![127 as char], // 127 is the delete ASCII character
-                ],
+                vec!['\\'],
+                vec!['{'],
+                vec!['}'],
+                vec!['$'],
+                vec!['&'],
+                vec!['\n', 10 as char], // 10 is the Vertical Tab ASCII character
+                vec!['#'],
+                vec!['^'],
+                vec!['_'],
+                vec![0 as char], // ASCII null
+                vec![' ', 13 as char], // 13 is the Horizontal Tab ASCII character
+                generate_alpha(),
+                vec!['@'], // And others...
+                vec!['~'],
+                vec!['%'],
+                vec![127 as char], // 127 is the delete ASCII character
+            ],
         }
     }
 }

@@ -56,7 +56,7 @@ fn test_peek_next() {
         LexerToken::new(Token::BeginGroup, Position::new(1, 0)),
         LexerToken::new(
             Token::Text("a string enclosed by a group"),
-            Position::new(1, 1)
+            Position::new(1, 1),
         ),
         LexerToken::new(Token::EndGroup, Position::new(1, 29)),
         LexerToken::new(Token::EndOfFile, Position::new(1, 30)),
@@ -92,7 +92,7 @@ fn test_next_and_peek() {
         LexerToken::new(Token::BeginGroup, Position::new(1, 0)),
         LexerToken::new(
             Token::Text("a string enclosed by a group"),
-            Position::new(1, 1)
+            Position::new(1, 1),
         ),
         LexerToken::new(Token::EndGroup, Position::new(1, 29)),
         LexerToken::new(Token::EndOfFile, Position::new(1, 30)),
