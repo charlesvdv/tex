@@ -9,6 +9,7 @@ mod macros;
 // Interpreters.
 pub mod quit;
 pub mod catcode;
+pub mod macro_def;
 
 pub struct CommandInterpreter {
     interpreters: Vec<Box<ParsingInterpreter>>,
@@ -26,6 +27,7 @@ impl Default for CommandInterpreter {
         CommandInterpreter {
             interpreters: vec![
                 Box::new(quit::QuitCommandInterpreter::new()),
+                Box::new(macro_def::MacroDefCommandInterpreter::new()),
                 Box::new(catcode::CatcodeCommandInterpreter::new()),
             ],
         }

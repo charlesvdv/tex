@@ -19,3 +19,4 @@ generate_test!(simple_multiline);
 generate_test!(comment);
 generate_test!(simple_catcode);
 generate_test!(catcodes_groups);
+generate_test!(macro_def);
