@@ -40,11 +40,11 @@ impl ParsingInterpreter for CommandInterpreter {
         }
     }
 
-    fn run(
+    fn run<'a>(
         &self,
         out: &mut Vec<TeXToken>,
-        lexer: &mut LexTokenIterator,
-        ctx: &mut Context,
+        lexer: &mut LexTokenIterator<'a>,
+        ctx: &mut Context<'a>,
     ) -> ParsingResult<Option<InterpreterOutput>> {
         self.launch_interpreters_once(out, lexer, ctx)
     }

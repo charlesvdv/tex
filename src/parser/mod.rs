@@ -50,11 +50,11 @@ pub trait ParsingInterpreter {
     ///
     /// Run the interpreter. We should check if the interpreter match before
     /// calling this function.
-    fn run(
+    fn run<'a>(
         &self,
         out: &mut Vec<TeXToken>,
-        lexer: &mut LexTokenIterator,
-        ctx: &mut Context,
+        lexer: &mut LexTokenIterator<'a>,
+        ctx: &mut Context<'a>,
     ) -> ParsingResult<Option<InterpreterOutput>>;
 }
 
@@ -68,11 +68,11 @@ pub trait InterpretersLauncher {
     fn get_interpreters(&self) -> &Vec<Box<ParsingInterpreter>>;
 
     /// Only launch one interpreter and then return with the result.
-    fn launch_interpreters_once(
+    fn launch_interpreters_once<'a>(
         &self,
         out: &mut Vec<TeXToken>,
-        lexer: &mut LexTokenIterator,
-        ctx: &mut Context,
+        lexer: &mut LexTokenIterator<'a>,
+        ctx: &mut Context<'a>,
     ) -> ParsingResult<Option<InterpreterOutput>> {
         let mut matched = false;
 
@@ -103,11 +103,11 @@ pub trait InterpretersLauncher {
     }
 
     /// Launch interpreters until the end of an input.
-    fn launch_interpreters(
+    fn launch_interpreters<'a>(
         &self,
         out: &mut Vec<TeXToken>,
-        lexer: &mut LexTokenIterator,
-        ctx: &mut Context,
+        lexer: &mut LexTokenIterator<'a>,
+        ctx: &mut Context<'a>,
     ) -> ParsingResult<Option<InterpreterOutput>> {
         loop {
             match self.launch_interpreters_once(out, lexer, ctx)? {

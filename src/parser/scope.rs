@@ -1,12 +1,13 @@
 use lexer::Catcodes;
+use parser::MacroDefinition;
 
 /// Handle TeX groups.
-pub struct Groups {
+pub struct Groups<'a> {
     default: DefaultScope,
-    stack: Vec<ScopeHolder>,
+    stack: Vec<ScopeHolder<'a>>,
 }
 
-impl Groups {
+impl<'a> Groups<'a> {
     pub fn new() -> Self {
         Groups {
             default: DefaultScope::Normal,
@@ -46,8 +47,13 @@ impl Groups {
         }
     }
 
+    pub fn add_macro_definition(&mut self, def: MacroDefinition<'a>) {
+        let mut scopes = self.get_scopes();
+        scopes.last_mut().unwrap().macro_defs.push(def);
+    }
+
     /// Get all the scopes that we need to change according to the current default scope.
-    fn get_scopes(&mut self) -> Vec<&mut ScopeHolder> {
+    fn get_scopes(&mut self) -> Vec<&mut ScopeHolder<'a>> {
         match self.default {
             // Should be safe to unwrap because we can't have a state where the global scope
             // is not present.
@@ -73,13 +79,17 @@ pub enum DefaultScope {
 
 /// Hold information about one scope.
 #[derive(Clone)]
-struct ScopeHolder {
+struct ScopeHolder<'a> {
     catcodes: Catcodes,
+    macro_defs: Vec<MacroDefinition<'a>>,
 }
 
-impl ScopeHolder {
-    pub fn new() -> ScopeHolder {
-        ScopeHolder { catcodes: Catcodes::default() }
+impl<'a> ScopeHolder<'a> {
+    pub fn new() -> ScopeHolder<'a> {
+        ScopeHolder {
+            catcodes: Catcodes::default(),
+            macro_defs: vec![],
+        }
     }
 
     fn set_catcode(&mut self, code: usize, value: char) {

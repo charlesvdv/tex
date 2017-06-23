@@ -9,7 +9,7 @@ use parser::groups::{BeginGroupInterpreter, EndGroupInterpreter};
 
 pub struct Parser<'a> {
     lexer: Lexer<'a>,
-    ctx: Context,
+    ctx: Context<'a>,
 }
 
 impl<'a> Parser<'a> {
